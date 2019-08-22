@@ -72,17 +72,31 @@
   
     <article id="post-test2" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2019/08/22/test2/" class="article-date">
-  <time datetime="2019-08-22T02:03:37.244Z" itemprop="datePublished">2019-08-22</time>
+    <a href="/2019/09/25/test2/" class="article-date">
+  <time datetime="2019-09-24T16:00:00.000Z" itemprop="datePublished">2019-09-25</time>
 </a>
     
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/组件安装/">组件安装</a>
+  </div>
+
   </div>
   <div class="article-inner">
     
     
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/09/25/test2/">安装keepalived</a>
+    </h1>
+  
+
+      </header>
+    
     <div class="article-entry" itemprop="articleBody">
       
-        <p>环境：192.168.15.161（主）<br>      192.168.15.155（从）<br>      192.168.15.154<br>虚拟ip： 192.168.15.10<br>先安装好nginx<br>在192.168.15.161上配置nginx.conf，进入/usr/local/nginx/conf/nginx.conf设置权重，161做转发，给154和155<br><img src="https://img-blog.csdn.net/20180810153804569?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzNDIzOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="这里写图片描述"><br>配置完启动每一台机器    nginx，/usr/local/nginx/sbin/nginx<br>修改155的/usr/local/nginx/html/index.html,内容增加155<br> <img src="https://img-blog.csdn.net/20180810153817159?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzNDIzOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="这里写图片描述"><br>同理，154服务器的也在内容增加154，方便区分开<br>测试ip访问情况<br>在浏览器输入192.168.15.161<br> <img src="https://img-blog.csdn.net/2018081015382925?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzNDIzOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="这里写图片描述"><br>刷新一下<br> <img src="https://img-blog.csdn.net/2018081015383544?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzNDIzOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="这里写图片描述"><br>Ip转发成功，并可以轮巡</p>
+        <p>###安装keepalived<br>环境：192.168.15.161（主）<br>      192.168.15.155（从）<br>      192.168.15.154<br>虚拟ip： 192.168.15.10<br>先安装好nginx<br>在192.168.15.161上配置nginx.conf，进入/usr/local/nginx/conf/nginx.conf设置权重，161做转发，给154和155<br><img src="https://img-blog.csdn.net/20180810153804569?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzNDIzOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="这里写图片描述"><br>配置完启动每一台机器    nginx，/usr/local/nginx/sbin/nginx<br>修改155的/usr/local/nginx/html/index.html,内容增加155<br> <img src="https://img-blog.csdn.net/20180810153817159?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzNDIzOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="这里写图片描述"><br>同理，154服务器的也在内容增加154，方便区分开<br>测试ip访问情况<br>在浏览器输入192.168.15.161<br> <img src="https://img-blog.csdn.net/2018081015382925?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzNDIzOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="这里写图片描述"><br>刷新一下<br> <img src="https://img-blog.csdn.net/2018081015383544?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzNDIzOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="这里写图片描述"><br>Ip转发成功，并可以轮巡</p>
 <p>Yum安装keepalived: yum install –y keepalived<br>安装完之后进入/etc/keepalived/keepalived.conf<br>配置如下显示<br>! Configuration File for keepalived</p>
 <p>global_defs {<br>   notification_email {<br>     <a href="mailto:acassen@firewall.loc" target="_blank" rel="noopener">acassen@firewall.loc</a><br>     <a href="mailto:failover@firewall.loc" target="_blank" rel="noopener">failover@firewall.loc</a><br>     <a href="mailto:sysadmin@firewall.loc" target="_blank" rel="noopener">sysadmin@firewall.loc</a><br>   }<br>   notification_email_from <a href="mailto:Alexandre.Cassen@firewall.loc" target="_blank" rel="noopener">Alexandre.Cassen@firewall.loc</a><br>   smtp_server 192.168.200.1<br>   smtp_connect_timeout 30<br>   router_id LVS_DEVEL</p>
 <h1 id="vrrp-skip-check-adv-addr-（这四句最好-掉-不然会无法访问VIP，亲测）"><a href="#vrrp-skip-check-adv-addr-（这四句最好-掉-不然会无法访问VIP，亲测）" class="headerlink" title="vrrp_skip_check_adv_addr  （这四句最好#掉,不然会无法访问VIP，亲测）"></a>vrrp_skip_check_adv_addr  （这四句最好#掉,不然会无法访问VIP，亲测）</h1><h1 id="vrrp-strict"><a href="#vrrp-strict" class="headerlink" title="vrrp_strict"></a>vrrp_strict</h1><h1 id="vrrp-garp-interval-0"><a href="#vrrp-garp-interval-0" class="headerlink" title="vrrp_garp_interval 0"></a>vrrp_garp_interval 0</h1><h1 id="vrrp-gna-interval-0"><a href="#vrrp-gna-interval-0" class="headerlink" title="vrrp_gna_interval 0"></a>vrrp_gna_interval 0</h1><p>}<br>vrrp_instance VI_1 {<br>state <strong>MASTER</strong> （从的为BACKUP）<br>    interface <strong>eno16777736</strong> （对应网卡接口）<br>    virtual_router_id 51<br>     priority <strong>100</strong>（优先级，从的应小于主的）<br>    advert_int 1<br>    authentication {<br>        auth_type PASS<br>        auth_pass 1111</p>
@@ -99,7 +113,7 @@ virtual_ipaddress {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/08/22/test2/" data-id="cjzm1mgeg00015es6gogbrh16" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/09/25/test2/" data-id="cjzm1l1ur00020hs6mrcgun15" class="article-share-link">Share</a>
       
       
     </footer>
@@ -142,7 +156,7 @@ virtual_ipaddress {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/08/10/test1/" data-id="cjzm1mgej00035es6x5iz5091" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/08/10/test1/" data-id="cjzlui9qh0000vhs6nxy9n8bm" class="article-share-link">Share</a>
       
       
     </footer>
@@ -189,7 +203,7 @@ virtual_ipaddress {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/08/01/test/" data-id="cjzm1mge700005es6j09uzvjz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/08/01/test/" data-id="cjzls7v5e0000jts6be4jzm51" class="article-share-link">Share</a>
       
       
     </footer>
@@ -209,7 +223,7 @@ virtual_ipaddress {
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Python匹配/">Python匹配</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python基础/">Python基础</a></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Python匹配/">Python匹配</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python基础/">Python基础</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/组件安装/">组件安装</a></li></ul>
     </div>
   </div>
 
@@ -224,7 +238,7 @@ virtual_ipaddress {
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li></ul>
     </div>
   </div>
 
@@ -237,7 +251,7 @@ virtual_ipaddress {
       <ul>
         
           <li>
-            <a href="/2019/08/22/test2/">(no title)</a>
+            <a href="/2019/09/25/test2/">安装keepalived</a>
           </li>
         
           <li>
