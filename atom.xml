@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>孙小爷的技术专栏</title>
+  
+  <subtitle>学习技术</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://yoursite.com/"/>
+  <updated>2019-08-22T02:07:54.940Z</updated>
+  <id>http://yoursite.com/</id>
+  
+  <author>
+    <name>孙小爷</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>安装keepalived</title>
+    <link href="http://yoursite.com/2019/09/25/test2/"/>
+    <id>http://yoursite.com/2019/09/25/test2/</id>
+    <published>2019-09-24T16:00:00.000Z</published>
+    <updated>2019-08-22T02:07:54.940Z</updated>
+    
+    <content type="html"><![CDATA[<p>###安装keepalived<br>环境：192.168.15.161（主）<br>      192.168.15.155（从）<br>      192.168.15.154<br>虚拟ip： 192.168.15.10<br>先安装好nginx<br>在192.168.15.161上配置nginx.conf，进入/usr/local/nginx/conf/nginx.conf设置权重，161做转发，给154和155<br><img src="https://img-blog.csdn.net/20180810153804569?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzNDIzOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="这里写图片描述"><br>配置完启动每一台机器    nginx，/usr/local/nginx/sbin/nginx<br>修改155的/usr/local/nginx/html/index.html,内容增加155<br> <img src="https://img-blog.csdn.net/20180810153817159?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzNDIzOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="这里写图片描述"><br>同理，154服务器的也在内容增加154，方便区分开<br>测试ip访问情况<br>在浏览器输入192.168.15.161<br> <img src="https://img-blog.csdn.net/2018081015382925?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzNDIzOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="这里写图片描述"><br>刷新一下<br> <img src="https://img-blog.csdn.net/2018081015383544?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzNDIzOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="这里写图片描述"><br>Ip转发成功，并可以轮巡</p><p>Yum安装keepalived: yum install –y keepalived<br>安装完之后进入/etc/keepalived/keepalived.conf<br>配置如下显示<br>! Configuration File for keepalived</p><p>global_defs {<br>   notification_email {<br>     <a href="mailto:acassen@firewall.loc" target="_blank" rel="noopener">acassen@firewall.loc</a><br>     <a href="mailto:failover@firewall.loc" target="_blank" rel="noopener">failover@firewall.loc</a><br>     <a href="mailto:sysadmin@firewall.loc" target="_blank" rel="noopener">sysadmin@firewall.loc</a><br>   }<br>   notification_email_from <a href="mailto:Alexandre.Cassen@firewall.loc" target="_blank" rel="noopener">Alexandre.Cassen@firewall.loc</a><br>   smtp_server 192.168.200.1<br>   smtp_connect_timeout 30<br>   router_id LVS_DEVEL</p><h1 id="vrrp-skip-check-adv-addr-（这四句最好-掉-不然会无法访问VIP，亲测）"><a href="#vrrp-skip-check-adv-addr-（这四句最好-掉-不然会无法访问VIP，亲测）" class="headerlink" title="vrrp_skip_check_adv_addr  （这四句最好#掉,不然会无法访问VIP，亲测）"></a>vrrp_skip_check_adv_addr  （这四句最好#掉,不然会无法访问VIP，亲测）</h1><h1 id="vrrp-strict"><a href="#vrrp-strict" class="headerlink" title="vrrp_strict"></a>vrrp_strict</h1><h1 id="vrrp-garp-interval-0"><a href="#vrrp-garp-interval-0" class="headerlink" title="vrrp_garp_interval 0"></a>vrrp_garp_interval 0</h1><h1 id="vrrp-gna-interval-0"><a href="#vrrp-gna-interval-0" class="headerlink" title="vrrp_gna_interval 0"></a>vrrp_gna_interval 0</h1><p>}<br>vrrp_instance VI_1 {<br>state <strong>MASTER</strong> （从的为BACKUP）<br>    interface <strong>eno16777736</strong> （对应网卡接口）<br>    virtual_router_id 51<br>     priority <strong>100</strong>（优先级，从的应小于主的）<br>    advert_int 1<br>    authentication {<br>        auth_type PASS<br>        auth_pass 1111</p><pre><code>} virtual_ipaddress {   192.168.15.10  （设置虚拟VIP号）</code></pre><p>   }<br>}  </p><p>设置完毕，把keepalived启动，systemctl start keepalived<br>同样，备机192.168.15.155设置keepalived，红色部分注意区分，设置完开启keepalived，systemctl start keepalived</p><p>先观察ip的绑定情况，<br>192.168.15.161<br>ip addr show<br> <img src="https://img-blog.csdn.net/20180810153902723?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzNDIzOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="这里写图片描述"></p><p>192.168.15.155<br>ip addr show<br><img src="https://img-blog.csdn.net/20180810153908710?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzNDIzOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="这里写图片描述"><br>主机有虚拟ip，从机没有<br>访问虚拟ip 192.168.15.10,访问成功<br><img src="https://img-blog.csdn.net/20180810153930832?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjkzNDIzOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="这里写图片描述"></p><p>现在把主机161的keepalived服务停掉，systemctl stop keeplived<br>发现虚拟ip从主机161转移到了备机155，并且访问虚拟ip时，页面为155的页面<br>如果把主机的Nginx停掉，nginx –s quit ,keepalived没停，虚拟ip并不会转移到备机，这时再访问虚拟ip的话会访问不了，所以要加一个检测nginx服务是否宕机的脚本<br>我自己在crontab –e 加上系统计划任务，写一个检测脚本check_nginx.sh放在/etc/keepalived下</p><p>#！/bin/bash<br>A=<code>Netstat –nplt|grep nginx|wc –l</code><br>if [ $A –eq 0 ];then<br>   Systemctl stop keepalived<br>fi<br>给脚本增加执行权限  chmod +x check_nginx.sh<br>在crontab上 * * * * * bash /etc/keepalived/check_nginx.sh ; sleep 2<br>每2秒检测一次，如果检测到nginx不存在，则kill掉keepalived服务<br>当然，检测脚本可以在keepalived的配置文件做配置，把脚本路径添加到keepalived.conf中，自己尝试过，可是把nginx停掉的时候，keepalived并没有停止，所以就借用了系统计划任务来实现检测。欢迎各位来讨论下keepalived为什么检测不到nginx的服务是否存在</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;###安装keepalived&lt;br&gt;环境：192.168.15.161（主）&lt;br&gt;      192.168.15.155（从）&lt;br&gt;      192.168.15.154&lt;br&gt;虚拟ip： 192.168.15.10&lt;br&gt;先安装好nginx&lt;br&gt;在192.16
+      
+    
+    </summary>
+    
+    
+      <category term="组件安装" scheme="http://yoursite.com/categories/%E7%BB%84%E4%BB%B6%E5%AE%89%E8%A3%85/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>today24</title>
+    <link href="http://yoursite.com/2019/09/24/today24/"/>
+    <id>http://yoursite.com/2019/09/24/today24/</id>
+    <published>2019-09-24T03:19:11.000Z</published>
+    <updated>2019-08-22T03:28:01.728Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/2019/09/24/today24/curry.jpg" alt></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;&lt;img src=&quot;/2019/09/24/today24/curry.jpg&quot; alt&gt;&lt;/p&gt;
+
+      
+    
+    </summary>
+    
+    
+      <category term="basketball player" scheme="http://yoursite.com/categories/basketball-player/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>test3.md</title>
+    <link href="http://yoursite.com/2019/08/22/test3-md/"/>
+    <id>http://yoursite.com/2019/08/22/test3-md/</id>
+    <published>2019-08-22T03:06:08.000Z</published>
+    <updated>2019-08-22T03:29:51.167Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/2019/08/22/test3-md/1.png" alt><br><img src="/2019/08/22/test3-md/curry.jpg" alt></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;&lt;img src=&quot;/2019/08/22/test3-md/1.png&quot; alt&gt;&lt;br&gt;&lt;img src=&quot;/2019/08/22/test3-md/curry.jpg&quot; alt&gt;&lt;/p&gt;
+
+      
+    
+    </summary>
+    
+    
+      <category term="image" scheme="http://yoursite.com/categories/image/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Python框架</title>
+    <link href="http://yoursite.com/2019/08/19/django/"/>
+    <id>http://yoursite.com/2019/08/19/django/</id>
+    <published>2019-08-18T16:00:00.000Z</published>
+    <updated>2019-08-22T04:11:12.145Z</updated>
+    
+    <content type="html"><![CDATA[<p>##Django用例<br><img src="/2019/08/19/django/django.jpg" alt="django模块"></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;##Django用例&lt;br&gt;&lt;img src=&quot;/2019/08/19/django/django.jpg&quot; alt=&quot;django模块&quot;&gt;&lt;/p&gt;
+
+      
+    
+    </summary>
+    
+    
+      <category term="Django" scheme="http://yoursite.com/categories/Django/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Python爬虫</title>
+    <link href="http://yoursite.com/2019/08/10/test1/"/>
+    <id>http://yoursite.com/2019/08/10/test1/</id>
+    <published>2019-08-09T16:00:00.000Z</published>
+    <updated>2019-08-21T22:54:13.734Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Python爬虫"><a href="#Python爬虫" class="headerlink" title="Python爬虫"></a>Python爬虫</h2><p>正则表达式<br>import re<br>re.match #从开始位置开始匹配，如果开头没有则无</p><p>re.search #搜索整个字符串</p><p>re.findall #搜索整个字符串，返回一个list<br>模式    描述<br>^    匹配字符串的开头<br>$    匹配字符串的末尾。<br>.    匹配任意字符，除了换行符，当re.DOTALL标记被指定时，则可以匹配包括换行符的任意字符。<br>[…]    用来表示一组字符,单独列出：[amk] 匹配 ‘a’，’m’或’k’<br>[^…]    不在[]中的字符：[^abc] 匹配除了a,b,c之外的字符。<br>re*    匹配0个或多个的表达式。<br>re+    匹配1个或多个的表达式。<br>re?    匹配0个或1个由前面的正则表达式定义的片段，非贪婪方式<br>re{ n}<br>re{ n,}    精确匹配n个前面表达式。<br>re{ n, m}    匹配 n 到 m 次由前面的正则表达式定义的片段，贪婪方式<br>a| b    匹配a或b<br>(re)    G匹配括号内的表达式，也表示一个组<br>(?imx)    正则表达式包含三种可选标志：i, m, 或 x 。只影响括号中的区域。<br>(?-imx)    正则表达式关闭 i, m, 或 x 可选标志。只影响括号中的区域。<br>(?: re)    类似 (…), 但是不表示一个组<br>(?imx: re)    在括号中使用i, m, 或 x 可选标志<br>(?-imx: re)    在括号中不使用i, m, 或 x 可选标志<br>(?#…)    注释.<br>(?= re)    前向肯定界定符。如果所含正则表达式，以 … 表示，在当前位置成功匹配时成功，否则失败。但一旦所含表达式已经尝试，匹配引擎根本没有提高；模式的剩余部分还要尝试界定符的右边。<br>(?! re)    前向否定界定符。与肯定界定符相反；当所含表达式不能在字符串当前位置匹配时成功<br>(?&gt; re)    匹配的独立模式，省去回溯。<br>\w    匹配字母数字<br>\W    匹配非字母数字<br>\s    匹配任意空白字符，等价于 [\t\n\r\f].<br>\S    匹配任意非空字符<br>\d    匹配任意数字，等价于 [0-9].<br>\D    匹配任意非数字<br>\A    匹配字符串开始<br>\Z    匹配字符串结束，如果是存在换行，只匹配到换行前的结束字符串。c<br>\z    匹配字符串结束<br>\G    匹配最后匹配完成的位置。<br>\b    匹配一个单词边界，也就是指单词和空格间的位置。例如， ‘er\b’ 可以匹配”never” 中的 ‘er’，但不能匹配 “verb” 中的 ‘er’。<br>\B    匹配非单词边界。’er\B’ 能匹配 “verb” 中的 ‘er’，但不能匹配 “never” 中的 ‘er’。<br>\n, \t, 等.    匹配一个换行符。匹配一个制表符。等<br>\1…\9    匹配第n个分组的子表达式。<br>\10    匹配第n个分组的子表达式，如果它经匹配。否则指的是八进制字符码的表达式。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;Python爬虫&quot;&gt;&lt;a href=&quot;#Python爬虫&quot; class=&quot;headerlink&quot; title=&quot;Python爬虫&quot;&gt;&lt;/a&gt;Python爬虫&lt;/h2&gt;&lt;p&gt;正则表达式&lt;br&gt;import re&lt;br&gt;re.match #从开始位置开始匹配，如果开头
+      
+    
+    </summary>
+    
+    
+      <category term="Python匹配" scheme="http://yoursite.com/categories/Python%E5%8C%B9%E9%85%8D/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Python编程惯例</title>
+    <link href="http://yoursite.com/2019/08/01/test/"/>
+    <id>http://yoursite.com/2019/08/01/test/</id>
+    <published>2019-07-31T16:00:00.000Z</published>
+    <updated>2019-08-21T21:40:03.872Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Python惯例"><a href="#Python惯例" class="headerlink" title="Python惯例"></a>Python惯例</h2><p>“惯例”这个词指的是“习惯的做法，常规的办法，一贯的做法”，与这个词对应的英文单词叫“idiom”。由于Python跟其他很多编程语言在语法和使用上还是有比较显著的差别，因此作为一个Python开发者如果不能掌握这些惯例，就无法写出“Pythonic”的代码。下面我们总结了一些在Python开发中的惯用的代码。</p><ol><li><p>让代码既可以被导入又可以被执行。<br>if <strong>name</strong> == ‘<strong>main</strong>‘:</p></li><li><p>用下面的方式判断逻辑“真”或“假”。<br>if x:<br>if not x:</p></li></ol>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;Python惯例&quot;&gt;&lt;a href=&quot;#Python惯例&quot; class=&quot;headerlink&quot; title=&quot;Python惯例&quot;&gt;&lt;/a&gt;Python惯例&lt;/h2&gt;&lt;p&gt;“惯例”这个词指的是“习惯的做法，常规的办法，一贯的做法”，与这个词对应的英文单词叫“idi
+      
+    
+    </summary>
+    
+    
+      <category term="Python基础" scheme="http://yoursite.com/categories/Python%E5%9F%BA%E7%A1%80/"/>
+    
+    
+  </entry>
+  
+</feed>
